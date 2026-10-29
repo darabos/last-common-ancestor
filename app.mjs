@@ -13,6 +13,7 @@ const errorMessage = document.querySelector("#form-error");
 const stamp = document.querySelector("#simulation-stamp");
 const generationCount = document.querySelector("#generation-count");
 const diagram = document.querySelector("#genealogy");
+const diagramFrame = document.querySelector("#diagram-frame");
 const emptyState = document.querySelector("#empty-state");
 const statusMessage = document.querySelector("#status-message");
 const selectionSummary = document.querySelector("#selection-summary");
@@ -70,13 +71,16 @@ function runSimulation(event) {
 }
 
 function layoutIndividuals() {
-  const width = Math.max(1080, Number(sizeInput.value) * 70 + 200);
+  const width = Math.max(1, diagramFrame.clientWidth);
   const rowHeight = 106;
   const top = 96;
   const height = top + simulation.generations.length * rowHeight + 48;
   const positions = new Map();
   const rowY = new Map();
   const midpoint = width / 2;
+  const leftInset = Math.min(58, width * 0.2);
+  const rightInset = Math.min(28, width * 0.1);
+  const splitGap = Math.min(46, width * 0.14);
 
   simulation.generations.forEach((row, rowIndex) => {
     const y = top + rowIndex * rowHeight;
@@ -84,16 +88,20 @@ function layoutIndividuals() {
 
     for (const population of row.populations) {
       const { individuals, side } = population;
-      let start = 64;
-      let end = width - 64;
-      if (side === "left") end = midpoint - 58;
-      if (side === "right") start = midpoint + 58;
+      let start = leftInset;
+      let end = width - rightInset;
+      if (side === "left") end = midpoint - splitGap;
+      if (side === "right") start = midpoint + splitGap;
+      const spacing = individuals.length > 1
+        ? (end - start) / (individuals.length - 1)
+        : end - start;
+      const radius = Math.min(11, spacing * 0.32);
 
       individuals.forEach((individual, index) => {
         const x = individuals.length === 1
           ? (start + end) / 2
           : start + (end - start) * index / (individuals.length - 1);
-        positions.set(individual.id, { x, y, individual });
+        positions.set(individual.id, { x, y, radius, showLabel: spacing >= 30, individual });
       });
     }
   });
@@ -163,7 +171,7 @@ function renderDiagram() {
       if (!parent) continue;
       const curve = (parent.y + child.y) / 2;
       links.append(svgElement("path", {
-        d: `M ${parent.x} ${parent.y + 13} C ${parent.x} ${curve}, ${child.x} ${curve}, ${child.x} ${child.y - 13}`,
+        d: `M ${parent.x} ${parent.y + parent.radius + 2} C ${parent.x} ${curve}, ${child.x} ${curve}, ${child.x} ${child.y - child.radius - 2}`,
         class: `parent-link${selectedIds.has(parentId) || ancestors.has(parentId) || descendants.has(parentId) ? " is-related" : ""}`,
       }));
     }
@@ -191,11 +199,13 @@ function renderDiagram() {
       "aria-label": `Generation ${individual.generation}, ${individual.gender}, individual ${individual.id}${isCommon ? ", last common ancestor" : ""}`,
       "data-id": individual.id,
     });
-    node.append(svgElement("circle", { class: "node-halo", r: 19 }));
-    node.append(svgElement("circle", { class: "node-core", r: 11 }));
-    const label = svgElement("text", { class: "node-id", x: 0, y: 29, "text-anchor": "middle" });
-    label.textContent = `#${individual.id}`;
-    node.append(label);
+    node.append(svgElement("circle", { class: "node-halo", r: position.radius + 5 }));
+    node.append(svgElement("circle", { class: "node-core", r: position.radius }));
+    if (position.showLabel) {
+      const label = svgElement("text", { class: "node-id", x: 0, y: position.radius + 18, "text-anchor": "middle" });
+      label.textContent = `#${individual.id}`;
+      node.append(label);
+    }
     node.addEventListener("click", () => toggleSelection(individual.id));
     node.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
@@ -262,5 +272,13 @@ clearButton.addEventListener("click", () => {
   selectedIds.clear();
   render();
 });
+
+let lastFrameWidth = 0;
+new ResizeObserver(() => {
+  const frameWidth = diagramFrame.clientWidth;
+  if (frameWidth === lastFrameWidth) return;
+  lastFrameWidth = frameWidth;
+  if (simulation && !simulation.preSplitExtinct) renderDiagram();
+}).observe(diagramFrame);
 
 runSimulation();
