@@ -117,7 +117,21 @@ function asMap(individuals) {
     : new Map(individuals.map((individual) => [individual.id, individual]));
 }
 
-export function findAncestors(individualId, individuals, includeSelf = false) {
+export function isEligibleLineageEdge(parent, child, lineage = "both", direction = "descendant") {
+  if (lineage === "paternal") {
+    return parent.gender === "male"
+      && child.fatherId === parent.id
+      && (direction === "ancestor" || child.gender === "male");
+  }
+  if (lineage === "maternal") {
+    return parent.gender === "female"
+      && child.motherId === parent.id
+      && (direction === "ancestor" || child.gender === "female");
+  }
+  return child.fatherId === parent.id || child.motherId === parent.id;
+}
+
+export function findAncestors(individualId, individuals, includeSelf = false, lineage = "both") {
   const byId = asMap(individuals);
   const ancestors = new Set(includeSelf ? [individualId] : []);
   const pending = [individualId];
@@ -127,7 +141,8 @@ export function findAncestors(individualId, individuals, includeSelf = false) {
     if (!individual) continue;
 
     for (const parentId of [individual.fatherId, individual.motherId]) {
-      if (parentId !== null && !ancestors.has(parentId)) {
+      const parent = byId.get(parentId);
+      if (parent && isEligibleLineageEdge(parent, individual, lineage, "ancestor") && !ancestors.has(parentId)) {
         ancestors.add(parentId);
         pending.push(parentId);
       }
@@ -137,13 +152,14 @@ export function findAncestors(individualId, individuals, includeSelf = false) {
   return ancestors;
 }
 
-export function findDescendants(individualId, individuals, includeSelf = false) {
+export function findDescendants(individualId, individuals, includeSelf = false, lineage = "both") {
   const byId = asMap(individuals);
   const childrenByParent = new Map();
 
   for (const individual of byId.values()) {
     for (const parentId of [individual.fatherId, individual.motherId]) {
-      if (parentId === null) continue;
+      const parent = byId.get(parentId);
+      if (!parent || !isEligibleLineageEdge(parent, individual, lineage)) continue;
       const children = childrenByParent.get(parentId) ?? [];
       children.push(individual.id);
       childrenByParent.set(parentId, children);
@@ -165,15 +181,15 @@ export function findDescendants(individualId, individuals, includeSelf = false) 
   return descendants;
 }
 
-export function findLastCommonAncestors(selectedIds, individuals) {
+export function findLastCommonAncestors(selectedIds, individuals, lineage = "both") {
   if (selectedIds.length < 2) return new Set();
 
   const byId = asMap(individuals);
   const [firstId, ...otherIds] = selectedIds;
-  const common = findAncestors(firstId, byId, true);
+  const common = findAncestors(firstId, byId, true, lineage);
 
   for (const individualId of otherIds) {
-    const ancestors = findAncestors(individualId, byId, true);
+    const ancestors = findAncestors(individualId, byId, true, lineage);
     for (const candidateId of common) {
       if (!ancestors.has(candidateId)) common.delete(candidateId);
     }

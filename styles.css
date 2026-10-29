@@ -121,6 +121,14 @@ h1 { margin: 0; font-family: var(--serif); font-size: clamp(32px, 4vw, 48px); fo
 }
 .control-field input:focus { border-color: var(--forest); box-shadow: 0 0 0 2px rgba(35, 102, 87, 0.13); }
 .control-divider { width: 1px; height: 42px; background: var(--line); }
+.lineage-control { min-width: 288px; display: grid; gap: 8px; margin: 0; padding: 0; border: 0; }
+.lineage-control .field-label { padding: 0; }
+.lineage-segmented { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 3px; background: #f3f6f1; }
+.lineage-choice { position: relative; flex: 1; cursor: pointer; }
+.lineage-choice input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.lineage-choice span { min-height: 31px; display: flex; align-items: center; justify-content: center; padding: 5px 8px; border-radius: 2px; color: #64736a; font-size: 10px; text-align: center; white-space: nowrap; }
+.lineage-choice input:checked + span { background: var(--surface); color: var(--forest); box-shadow: 0 1px 3px rgba(29, 49, 43, 0.14); }
+.lineage-choice input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 1px; }
 
 .run-button {
   min-width: 178px;
@@ -217,6 +225,14 @@ h1 { margin: 0; font-family: var(--serif); font-size: clamp(32px, 4vw, 48px); fo
 
 @keyframes arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 
+@media (max-width: 1100px) {
+  .controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .control-field { min-width: 0; }
+  .control-divider { display: none; }
+  .lineage-control { grid-column: 1 / 3; min-width: 0; }
+  .run-button { grid-column: 3; width: 100%; min-width: 0; margin: 0; align-self: end; }
+}
+
 @media (max-width: 760px) {
   .workspace { width: min(100% - 32px, 620px); }
   .heading-row { min-height: 132px; }
@@ -225,6 +241,8 @@ h1 { margin: 0; font-family: var(--serif); font-size: clamp(32px, 4vw, 48px); fo
   .controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 14px; }
   .control-field { min-width: 0; }
   .control-divider { display: none; }
+  .lineage-control { grid-column: 1 / -1; }
+  .lineage-choice span { white-space: normal; }
   .run-button { grid-column: 1 / -1; width: 100%; margin: 2px 0 0; }
   .results-head { align-items: flex-start; flex-direction: column; gap: 10px; padding: 14px; }
   .legend { width: 100%; flex-wrap: wrap; gap: 10px 15px; }

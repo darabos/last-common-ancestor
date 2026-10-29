@@ -47,6 +47,23 @@
           <span class="field-label">G<sub>2</sub> <span>AFTER SPLIT</span></span>
           <input id="post-split-generations" name="post-split-generations" type="number" min="0" step="1" value="4" required />
         </label>
+        <fieldset class="lineage-control">
+          <legend class="field-label">LINEAGE <span>HIGHLIGHT MODE</span></legend>
+          <div class="lineage-segmented">
+            <label class="lineage-choice">
+              <input type="radio" name="lineage-mode" value="both" checked />
+              <span>Both parents</span>
+            </label>
+            <label class="lineage-choice">
+              <input type="radio" name="lineage-mode" value="paternal" />
+              <span>Father to son</span>
+            </label>
+            <label class="lineage-choice">
+              <input type="radio" name="lineage-mode" value="maternal" />
+              <span>Mother to daughter</span>
+            </label>
+          </div>
+        </fieldset>
         <button class="run-button" type="submit">
           <span>Run simulation</span>
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 5l5 5-5 5" /></svg>

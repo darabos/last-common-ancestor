@@ -2,6 +2,7 @@ import {
   findAncestors,
   findDescendants,
   findLastCommonAncestors,
+  isEligibleLineageEdge,
   simulatePopulation,
 } from "./model.mjs";
 
@@ -9,6 +10,7 @@ const form = document.querySelector("#simulation-form");
 const sizeInput = document.querySelector("#population-size");
 const g1Input = document.querySelector("#pre-split-generations");
 const g2Input = document.querySelector("#post-split-generations");
+const lineageInputs = document.querySelectorAll('input[name="lineage-mode"]');
 const errorMessage = document.querySelector("#form-error");
 const stamp = document.querySelector("#simulation-stamp");
 const generationCount = document.querySelector("#generation-count");
@@ -21,6 +23,7 @@ const clearButton = document.querySelector("#clear-selection");
 
 let simulation = null;
 let selectedIds = new Set();
+let lineageMode = "both";
 
 function svgElement(name, attributes = {}) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -115,14 +118,14 @@ function getHighlights() {
   const allIndividuals = simulation.individuals;
 
   for (const id of selectedIds) {
-    for (const ancestorId of findAncestors(id, allIndividuals)) ancestors.add(ancestorId);
-    for (const descendantId of findDescendants(id, allIndividuals)) descendants.add(descendantId);
+    for (const ancestorId of findAncestors(id, allIndividuals, false, lineageMode)) ancestors.add(ancestorId);
+    for (const descendantId of findDescendants(id, allIndividuals, false, lineageMode)) descendants.add(descendantId);
   }
 
   return {
     ancestors,
     descendants,
-    common: findLastCommonAncestors([...selectedIds], allIndividuals),
+    common: findLastCommonAncestors([...selectedIds], allIndividuals, lineageMode),
   };
 }
 
@@ -170,9 +173,14 @@ function renderDiagram() {
       const parent = positions.get(parentId);
       if (!parent) continue;
       const curve = (parent.y + child.y) / 2;
+      const isAncestorEdge = isEligibleLineageEdge(parent.individual, child.individual, lineageMode, "ancestor")
+        && (selectedIds.has(child.individual.id) || ancestors.has(child.individual.id));
+      const isDescendantEdge = isEligibleLineageEdge(parent.individual, child.individual, lineageMode, "descendant")
+        && (selectedIds.has(parentId) || descendants.has(parentId));
+      const isRelatedEdge = isAncestorEdge || isDescendantEdge;
       links.append(svgElement("path", {
         d: `M ${parent.x} ${parent.y + parent.radius + 2} C ${parent.x} ${curve}, ${child.x} ${curve}, ${child.x} ${child.y - child.radius - 2}`,
-        class: `parent-link${selectedIds.has(parentId) || ancestors.has(parentId) || descendants.has(parentId) ? " is-related" : ""}`,
+        class: `parent-link${isRelatedEdge ? " is-related" : ""}`,
       }));
     }
   }
@@ -244,7 +252,7 @@ function renderSelection() {
     return;
   }
 
-  const common = findLastCommonAncestors([...selectedIds], simulation.individuals);
+  const common = findLastCommonAncestors([...selectedIds], simulation.individuals, lineageMode);
   const selectionLabel = `${count} individual${count === 1 ? "" : "s"} selected`;
   if (count < 2) {
     selectionSummary.textContent = selectionLabel;
@@ -268,6 +276,13 @@ function toggleSelection(id) {
 }
 
 form.addEventListener("submit", runSimulation);
+lineageInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    if (!input.checked) return;
+    lineageMode = input.value;
+    if (simulation) render();
+  });
+});
 clearButton.addEventListener("click", () => {
   selectedIds.clear();
   render();

@@ -4,6 +4,7 @@ import {
   findAncestors,
   findDescendants,
   findLastCommonAncestors,
+  isEligibleLineageEdge,
   simulatePopulation,
 } from "./model.mjs";
 
@@ -68,4 +69,34 @@ test("finds ancestor and descendant closure and newest shared ancestors", () => 
   assert.deepEqual(findLastCommonAncestors(["d", "e"], individuals), new Set(["b", "c"]));
   assert.deepEqual(findLastCommonAncestors(["b", "d"], individuals), new Set(["b"]));
   assert.deepEqual(findLastCommonAncestors(["d"], individuals), new Set());
+});
+
+test("restricts traversal and common ancestors to the selected lineage", () => {
+  const individuals = [
+    { id: "p-root", generation: 1, gender: "male", fatherId: null, motherId: null },
+    { id: "m-root", generation: 1, gender: "female", fatherId: null, motherId: null },
+    { id: "father", generation: 2, gender: "male", fatherId: "p-root", motherId: "m-root" },
+    { id: "mother", generation: 2, gender: "female", fatherId: "p-root", motherId: "m-root" },
+    { id: "son-a", generation: 3, gender: "male", fatherId: "father", motherId: "mother" },
+    { id: "son-b", generation: 3, gender: "male", fatherId: "father", motherId: "mother" },
+    { id: "daughter", generation: 3, gender: "female", fatherId: "father", motherId: "mother" },
+    { id: "daughter-b", generation: 3, gender: "female", fatherId: "father", motherId: "mother" },
+    { id: "grandson", generation: 4, gender: "male", fatherId: "son-a", motherId: "daughter" },
+    { id: "granddaughter", generation: 4, gender: "female", fatherId: "son-a", motherId: "daughter" },
+  ];
+
+  assert.deepEqual(findAncestors("son-a", individuals, false, "paternal"), new Set(["father", "p-root"]));
+  assert.deepEqual(findAncestors("daughter", individuals, false, "paternal"), new Set(["father", "p-root"]));
+  assert.deepEqual(findAncestors("son-a", individuals, false, "maternal"), new Set(["mother", "m-root"]));
+  assert.deepEqual(findAncestors("daughter", individuals, false, "maternal"), new Set(["mother", "m-root"]));
+  assert.deepEqual(findDescendants("father", individuals, false, "paternal"), new Set(["son-a", "son-b", "grandson"]));
+  assert.deepEqual(findDescendants("mother", individuals, false, "maternal"), new Set(["daughter", "daughter-b", "granddaughter"]));
+  assert.deepEqual(findLastCommonAncestors(["son-a", "son-b"], individuals, "paternal"), new Set(["father"]));
+  assert.deepEqual(findLastCommonAncestors(["son-a", "son-b"], individuals, "maternal"), new Set(["mother"]));
+  assert.deepEqual(findLastCommonAncestors(["daughter", "daughter-b"], individuals, "maternal"), new Set(["mother"]));
+  assert.equal(isEligibleLineageEdge(individuals[2], individuals[6], "paternal"), false);
+  assert.equal(isEligibleLineageEdge(individuals[2], individuals[6], "paternal", "ancestor"), true);
+  assert.equal(isEligibleLineageEdge(individuals[3], individuals[4], "maternal"), false);
+  assert.equal(isEligibleLineageEdge(individuals[3], individuals[4], "maternal", "ancestor"), true);
+  assert.equal(isEligibleLineageEdge(individuals[3], individuals[6], "maternal"), true);
 });
