@@ -164,7 +164,7 @@ function renderDiagram() {
       const curve = (parent.y + child.y) / 2;
       links.append(svgElement("path", {
         d: `M ${parent.x} ${parent.y + 13} C ${parent.x} ${curve}, ${child.x} ${curve}, ${child.x} ${child.y - 13}`,
-        class: `parent-link${ancestors.has(parentId) || descendants.has(parentId) ? " is-related" : ""}`,
+        class: `parent-link${selectedIds.has(parentId) || ancestors.has(parentId) || descendants.has(parentId) ? " is-related" : ""}`,
       }));
     }
   }
