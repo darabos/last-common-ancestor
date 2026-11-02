@@ -25,6 +25,7 @@ body {
 
 button, input { font: inherit; }
 button { color: inherit; }
+a { color: var(--forest); }
 
 .workspace {
   width: min(1440px, calc(100% - 72px));
