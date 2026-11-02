@@ -12,11 +12,8 @@ const g1Input = document.querySelector("#pre-split-generations");
 const g2Input = document.querySelector("#post-split-generations");
 const lineageInputs = document.querySelectorAll('input[name="lineage-mode"]');
 const errorMessage = document.querySelector("#form-error");
-const stamp = document.querySelector("#simulation-stamp");
-const generationCount = document.querySelector("#generation-count");
 const diagram = document.querySelector("#genealogy");
 const diagramFrame = document.querySelector("#diagram-frame");
-const emptyState = document.querySelector("#empty-state");
 const statusMessage = document.querySelector("#status-message");
 const selectionSummary = document.querySelector("#selection-summary");
 const clearButton = document.querySelector("#clear-selection");
@@ -35,7 +32,6 @@ function svgElement(name, attributes = {}) {
 
 function setFormError(message) {
   errorMessage.textContent = message;
-  stamp.textContent = message ? "CHECK INPUT" : "READY";
 }
 
 function runSimulation(event) {
@@ -44,8 +40,8 @@ function runSimulation(event) {
   const g1 = Number(g1Input.value);
   const g2 = Number(g2Input.value);
 
-  if (!Number.isInteger(size) || size < 2 || size % 2 !== 0) {
-    setFormError("N must be an even whole number of at least 2.");
+  if (!Number.isInteger(size) || size < 1) {
+    setFormError("N must be a whole number of at least 1.");
     sizeInput.focus();
     return;
   }
@@ -69,7 +65,6 @@ function runSimulation(event) {
 
   selectedIds = new Set();
   setFormError("");
-  stamp.textContent = "COMPLETE";
   render();
 }
 
@@ -77,7 +72,7 @@ function layoutIndividuals() {
   const width = Math.max(1, diagramFrame.clientWidth);
   const rowHeight = 106;
   const top = 96;
-  const height = top + simulation.generations.length * rowHeight + 48;
+  const height = top + simulation.generations.length * rowHeight + 20;
   const positions = new Map();
   const rowY = new Map();
   const midpoint = width / 2;
@@ -149,19 +144,15 @@ function renderDiagram() {
   fragment.append(labels);
 
   if (splitRow) {
-    const splitY = rowY.get(splitRow.number) - 42;
+    const splitY = rowY.get(splitRow.number) + 90;
     const divider = svgElement("line", {
       x1: midpoint,
-      y1: splitY - 18,
+      y1: splitY,
       x2: midpoint,
-      y2: height - 24,
+      y2: height,
       class: "split-divider",
     });
-    const leftLabel = svgElement("text", { x: midpoint / 2, y: splitY, class: "side-label", "text-anchor": "middle" });
-    const rightLabel = svgElement("text", { x: midpoint + midpoint / 2, y: splitY, class: "side-label", "text-anchor": "middle" });
-    leftLabel.textContent = "LEFT POPULATION";
-    rightLabel.textContent = "RIGHT POPULATION";
-    fragment.append(divider, leftLabel, rightLabel);
+    fragment.append(divider);
   }
 
   const links = svgElement("g", { class: "links" });
@@ -230,15 +221,13 @@ function renderDiagram() {
 
 function renderStatus() {
   const rowCount = simulation.generations.length;
-  generationCount.textContent = `${rowCount} GENERATION${rowCount === 1 ? "" : "S"}`;
-  emptyState.hidden = !simulation.preSplitExtinct;
   diagram.hidden = simulation.preSplitExtinct;
 
   if (simulation.preSplitExtinct) {
-    statusMessage.textContent = `The population stopped before the split at generation ${rowCount}.`;
+    statusMessage.textContent = `Went extinct before the split at generation ${rowCount}.`;
   } else if (simulation.extinctSides.length > 0) {
     const names = simulation.extinctSides.map((side) => `${side} side`).join(" and ");
-    statusMessage.textContent = `The ${names} could not supply both parent roles and stopped.`;
+    statusMessage.textContent = `The ${names} went extinct.`;
   } else {
     statusMessage.textContent = `${simulation.individuals.length} individuals across ${rowCount} generations.`;
   }
@@ -266,7 +255,7 @@ function renderSelection() {
 function render() {
   renderStatus();
   renderSelection();
-  if (!simulation.preSplitExtinct) renderDiagram();
+  renderDiagram();
 }
 
 function toggleSelection(id) {

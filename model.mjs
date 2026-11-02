@@ -25,14 +25,14 @@ function generatePopulation(size, previous, generation, side, random, nextId) {
 }
 
 export function simulatePopulation({ size, g1, g2, random = Math.random }) {
-  if (!Number.isInteger(size) || size < 2 || size % 2 !== 0) {
-    throw new RangeError("N must be an even integer of at least 2.");
+  if (!Number.isInteger(size) || size < 1) {
+    throw new RangeError("N must be a positive integer.");
   }
   if (!Number.isInteger(g1) || g1 < 1) {
-    throw new RangeError("G1 must be an integer of at least 1.");
+    throw new RangeError("G1 must be a positive integer.");
   }
-  if (!Number.isInteger(g2) || g2 < 0) {
-    throw new RangeError("G2 must be an integer of at least 0.");
+  if (!Number.isInteger(g2) || g2 < 1) {
+    throw new RangeError("G2 must be a positive integer.");
   }
   if (typeof random !== "function") {
     throw new TypeError("random must be a function.");
@@ -50,7 +50,7 @@ export function simulatePopulation({ size, g1, g2, random = Math.random }) {
   }];
   let current = founders;
 
-  for (let generation = 2; generation <= g1; generation += 1) {
+  for (let generation = 2; generation <= g1 + 1; generation += 1) {
     const next = generatePopulation(size, current, generation, "population", random, nextId);
     if (!next) {
       return {
@@ -79,14 +79,14 @@ export function simulatePopulation({ size, g1, g2, random = Math.random }) {
   let left = splitRow.populations[0].individuals;
   let right = splitRow.populations[1].individuals;
 
-  for (let offset = 1; offset <= g2; offset += 1) {
+  for (let offset = 1; offset < g2; offset += 1) {
     const generation = g1 + offset;
     const nextLeft = extinctSides.has("left")
       ? null
-      : generatePopulation(size / 2, left, generation, "left", random, nextId);
+      : generatePopulation(Math.floor(size / 2), left, generation, "left", random, nextId);
     const nextRight = extinctSides.has("right")
       ? null
-      : generatePopulation(size / 2, right, generation, "right", random, nextId);
+      : generatePopulation(Math.ceil(size / 2), right, generation, "right", random, nextId);
 
     if (!nextLeft) extinctSides.add("left");
     if (!nextRight) extinctSides.add("right");

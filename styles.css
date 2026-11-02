@@ -8,9 +8,9 @@
   --forest: #236657;
   --coral: #d85e49;
   --gold: #d99a2b;
-  --serif: "Fraunces", Georgia, serif;
-  --sans: "DM Sans", "Helvetica Neue", sans-serif;
-  --mono: "DM Mono", "SFMono-Regular", Consolas, monospace;
+  --serif: Georgia, serif;
+  --sans: "Helvetica Neue", sans-serif;
+  --mono: "SFMono-Regular", Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -19,8 +19,6 @@ body {
   min-width: 320px;
   margin: 0;
   color: var(--ink);
-  background-color: var(--paper);
-  background-image: radial-gradient(#8b9b8e 0.55px, transparent 0.55px);
   background-size: 15px 15px;
   font-family: var(--sans);
 }
@@ -42,8 +40,8 @@ button { color: inherit; }
   border-bottom: 1px solid var(--line);
 }
 
-.wordmark, .topbar-note, .eyebrow, .generation-stamp, .field-label, .generation-count,
-.side-label, .generation-label, .page-footer, .empty-index {
+.wordmark, .topbar-note, .eyebrow, .generation-stamp, .field-label,
+.side-label, .generation-label, .page-footer {
   font-family: var(--mono);
   letter-spacing: 0;
 }
@@ -97,10 +95,6 @@ h1 { margin: 0; font-family: var(--serif); font-size: clamp(32px, 4vw, 48px); fo
   align-items: center;
   gap: 24px;
   padding: 16px 22px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  background: rgba(251, 252, 249, 0.93);
-  box-shadow: 0 8px 26px rgba(29, 49, 43, 0.035);
 }
 
 .control-field { min-width: 126px; display: grid; gap: 8px; }
@@ -155,39 +149,24 @@ h1 { margin: 0; font-family: var(--serif); font-size: clamp(32px, 4vw, 48px); fo
 
 .results {
   margin-top: 21px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  background: var(--surface);
-  box-shadow: 0 12px 30px rgba(29, 49, 43, 0.045);
-  overflow: hidden;
 }
 
 .results-head, .results-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .results-head { min-height: 66px; padding: 12px 20px; border-bottom: 1px solid var(--line); }
 .results-title-group { display: flex; align-items: baseline; gap: 12px; }
 .results-title-group h2 { margin: 0; font-family: var(--serif); font-size: 20px; font-weight: 500; }
-.generation-count { color: var(--muted); font-size: 9px; }
 .legend { display: flex; align-items: center; gap: 17px; }
 .legend-item { display: inline-flex; align-items: center; gap: 6px; color: #56665e; font-size: 10px; white-space: nowrap; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 .legend-dot.male { background: var(--forest); }
 .legend-dot.female { background: var(--coral); }
 .legend-ring { width: 12px; height: 12px; border: 2px solid var(--gold); border-radius: 50%; }
+.legend-ring.common { border-color: black; }
 .clear-button { padding: 5px 0 5px 12px; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--forest); cursor: pointer; font-size: 10px; }
 .clear-button:disabled { color: #a4aea7; cursor: default; }
 
 .diagram-frame {
   position: relative;
-  max-height: 660px;
-  min-height: 300px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  outline: none;
-  background-color: #f7f9f5;
-  background-image: linear-gradient(rgba(57, 91, 73, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 91, 73, 0.035) 1px, transparent 1px);
-  background-size: 26px 26px;
-  scrollbar-color: #bac6bb transparent;
-  scrollbar-width: thin;
 }
 .diagram-frame:focus-visible { box-shadow: inset 0 0 0 2px var(--gold); }
 .genealogy { display: block; width: 100%; max-width: 100%; height: auto; }
@@ -210,12 +189,6 @@ h1 { margin: 0; font-family: var(--serif); font-size: clamp(32px, 4vw, 48px); fo
 .individual.is-selected.is-common .node-halo { fill: rgba(217, 154, 43, 0.2); stroke: var(--gold); }
 .individual:focus-visible .node-halo { stroke: var(--ink); stroke-dasharray: 2 2; }
 .individual.is-selected .node-id, .individual.is-common .node-id { fill: var(--ink); font-weight: 500; }
-
-.empty-state { min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); text-align: center; }
-.empty-state[hidden] { display: none; }
-.empty-index { color: var(--coral); font-size: 11px; }
-.empty-state p { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 23px; }
-.empty-state span:last-child { font-size: 12px; }
 
 .results-foot { min-height: 47px; padding: 10px 20px; border-top: 1px solid var(--line); }
 .results-foot p, .selection-summary { margin: 0; color: var(--muted); font-size: 10px; }

@@ -5,50 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#eef2ec" />
     <title>Last Common Ancestor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <script type="module" src="app.mjs"></script>
   </head>
   <body>
     <main class="workspace">
-      <header class="topbar">
-        <a class="wordmark" href="./" aria-label="Last Common Ancestor home">
-          <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span>FIELD / 01</span>
-        </a>
-        <div class="topbar-note"><span class="live-dot"></span> POPULATION STUDY</div>
-      </header>
-
-      <section class="heading-row" aria-labelledby="page-title">
-        <div>
-          <p class="eyebrow">GENEALOGY LAB <span>—</span> 2026</p>
-          <h1 id="page-title">Last Common Ancestor</h1>
-        </div>
-        <div class="generation-stamp" aria-label="Simulation status">
-          <span class="stamp-label">SIMULATION</span>
-          <span class="stamp-value" id="simulation-stamp">READY</span>
-        </div>
-      </section>
-
       <form class="controls" id="simulation-form">
         <label class="control-field">
-          <span class="field-label">N <span>POPULATION</span></span>
-          <input id="population-size" name="population-size" type="number" min="2" step="2" value="12" required />
+          <span class="field-label">Population size</span>
+          <input id="population-size" name="population-size" type="number" min="1" step="1" value="30" required />
         </label>
         <span class="control-divider" aria-hidden="true"></span>
         <label class="control-field">
-          <span class="field-label">G<sub>1</sub> <span>BEFORE SPLIT</span></span>
+          <span class="field-label">Generations before split</span></span>
           <input id="pre-split-generations" name="pre-split-generations" type="number" min="1" step="1" value="4" required />
         </label>
         <span class="control-divider" aria-hidden="true"></span>
         <label class="control-field">
-          <span class="field-label">G<sub>2</sub> <span>AFTER SPLIT</span></span>
+          <span class="field-label">Generations after split</span>
           <input id="post-split-generations" name="post-split-generations" type="number" min="0" step="1" value="4" required />
         </label>
         <fieldset class="lineage-control">
-          <legend class="field-label">LINEAGE <span>HIGHLIGHT MODE</span></legend>
+          <legend class="field-label">Show lineage through</legend>
           <div class="lineage-segmented">
             <label class="lineage-choice">
               <input type="radio" name="lineage-mode" value="both" checked />
@@ -74,24 +52,19 @@
       <section class="results" aria-label="Population genealogy">
         <div class="results-head">
           <div class="results-title-group">
-            <h2>Genealogy</h2>
-            <span class="generation-count" id="generation-count">0 GENERATIONS</span>
+            <h2>Click to select/deselect individuals and see their lineage</h2>
           </div>
           <div class="legend" aria-label="Gender legend">
             <span class="legend-item"><i class="legend-dot male"></i> Male</span>
             <span class="legend-item"><i class="legend-dot female"></i> Female</span>
             <span class="legend-item"><i class="legend-ring"></i> Selected</span>
+            <span class="legend-item"><i class="legend-ring common"></i> Last common ancestor</span>
             <button class="clear-button" id="clear-selection" type="button" disabled>Clear selection</button>
           </div>
         </div>
 
         <div class="diagram-frame" id="diagram-frame" tabindex="0" aria-label="Scrollable genealogy diagram">
           <svg id="genealogy" class="genealogy" role="group" aria-label="Population genealogy diagram"></svg>
-          <div class="empty-state" id="empty-state" hidden>
-            <span class="empty-index">01</span>
-            <p>Generation could not continue.</p>
-            <span>The population needs both parent roles to reproduce.</span>
-          </div>
         </div>
 
         <div class="results-foot">
@@ -99,11 +72,6 @@
           <div class="selection-summary" id="selection-summary">No individuals selected</div>
         </div>
       </section>
-
-      <footer class="page-footer">
-        <span>LINEAGE SIMULATOR</span>
-        <span>FATHER + MOTHER LINKS <b>·</b> GENERATION BY GENERATION</span>
-      </footer>
     </main>
   </body>
 </html>
