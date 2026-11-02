@@ -18,12 +18,12 @@
         <span class="control-divider" aria-hidden="true"></span>
         <label class="control-field">
           <span class="field-label">Generations before split</span></span>
-          <input id="pre-split-generations" name="pre-split-generations" type="number" min="1" step="1" value="4" required />
+          <input id="pre-split-generations" name="pre-split-generations" type="number" min="1" step="1" value="5" required />
         </label>
         <span class="control-divider" aria-hidden="true"></span>
         <label class="control-field">
           <span class="field-label">Generations after split</span>
-          <input id="post-split-generations" name="post-split-generations" type="number" min="0" step="1" value="4" required />
+          <input id="post-split-generations" name="post-split-generations" type="number" min="0" step="1" value="5" required />
         </label>
         <fieldset class="lineage-control">
           <legend class="field-label">Show lineage through</legend>
@@ -49,11 +49,11 @@
       </form>
       <p class="form-error" id="form-error" role="alert" aria-live="polite"></p>
 
+      <div class="description">
+        <p>Click to select/deselect individuals and see their lineage. Or click a generation label (like "<tt>G03</tt>") to select the whole generation.</p>
+      </div>
       <section class="results" aria-label="Population genealogy">
         <div class="results-head">
-          <div class="results-title-group">
-            <h2>Click to select/deselect individuals and see their lineage</h2>
-          </div>
           <div class="legend" aria-label="Gender legend">
             <span class="legend-item"><i class="legend-dot male"></i> Male</span>
             <span class="legend-item"><i class="legend-dot female"></i> Female</span>

@@ -45,7 +45,7 @@ export function simulatePopulation({ size, g1, g2, random = Math.random }) {
   );
   const generations = [{
     number: 1,
-    stage: g1 === 1 ? "split" : "pre-split",
+    stage: g1 === 0 ? "split" : "pre-split",
     populations: [{ side: "population", individuals: founders }],
   }];
   let current = founders;
@@ -63,7 +63,7 @@ export function simulatePopulation({ size, g1, g2, random = Math.random }) {
 
     current = next;
     generations.push({
-      number: generation,
+      number: generations.at(-1).number + 1,
       stage: generation === g1 ? "split" : "pre-split",
       populations: [{ side: "population", individuals: current }],
     });
@@ -94,7 +94,7 @@ export function simulatePopulation({ size, g1, g2, random = Math.random }) {
     left = nextLeft ?? [];
     right = nextRight ?? [];
     generations.push({
-      number: generation,
+      number: generations.at(-1).number + 1,
       stage: "post-split",
       populations: [
         { side: "left", individuals: left },

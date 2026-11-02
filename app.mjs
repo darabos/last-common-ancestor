@@ -71,7 +71,7 @@ function runSimulation(event) {
 function layoutIndividuals() {
   const width = Math.max(1, diagramFrame.clientWidth);
   const rowHeight = 106;
-  const top = 96;
+  const top = 16;
   const height = top + simulation.generations.length * rowHeight + 20;
   const positions = new Map();
   const rowY = new Map();
@@ -137,8 +137,23 @@ function renderDiagram() {
   const labels = svgElement("g", { class: "row-labels" });
   for (const row of simulation.generations) {
     const y = rowY.get(row.number);
-    const label = svgElement("text", { x: 20, y: y + 4, class: "generation-label" });
+    const individuals = row.populations.flatMap((population) => population.individuals);
+    const label = svgElement("text", {
+      x: 10,
+      y: y + 4,
+      class: "generation-label",
+      role: "button",
+      tabindex: "0",
+      "aria-label": `Toggle selection for all ${individuals.length} individuals in generation ${row.number}`,
+    });
     label.textContent = `G${String(row.number).padStart(2, "0")}`;
+    label.addEventListener("click", () => toggleGenerationSelection(individuals));
+    label.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleGenerationSelection(individuals);
+      }
+    });
     labels.append(label);
   }
   fragment.append(labels);
@@ -261,6 +276,14 @@ function render() {
 function toggleSelection(id) {
   if (selectedIds.has(id)) selectedIds.delete(id);
   else selectedIds.add(id);
+  render();
+}
+
+function toggleGenerationSelection(individuals) {
+  for (const individual of individuals) {
+    if (selectedIds.has(individual.id)) selectedIds.delete(individual.id);
+    else selectedIds.add(individual.id);
+  }
   render();
 }
 
